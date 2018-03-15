@@ -20,7 +20,7 @@ class EventSearch {
     _encode_transforms() {
         return `eval ${this.transforms.join(', ')}`;
     }
-    _search(index=0, count=10, statsString=null, timechartString=null, cb, err) {
+    _search(index=0, count=10, statsString=null, timechartString=null) {
         let timeString = '';
         if (this.earliest)
             timeString += `earliest_time=${this.earliest} `;
@@ -39,23 +39,21 @@ class EventSearch {
             search.report = `timechart ${timechartString}`;
         let query = queryString.stringify(search);
         let uri = `${this.baseUrl}?${query}`;
-        fetch(uri, {
+        return fetch(uri, {
             headers: {
                 'Authorization': `Basic ${base64.encode(`${this.clientId}:${this.clientSecret}`)}`
             }
         })
-            .then(res => res.json())
-            .then(json => cb(json))
-            .catch(error => err(error));
+            .then(res => res.json());
     }
-    events(index=0, count=10, cb, err) {
-        return this._search(index=index, count=count, cb=cb, err=err);
+    events(index=0, count=10) {
+        return this._search(index=index, count=count);
     }
-    stats(statsString, cb, err) {
-        return self._search(statsString=statsString, cb=cb, err=err);
+    stats(statsString) {
+        return self._search(statsString=statsString);
     }
-    timechart(timechartString, cb, err) {
-        return self._search(timechartString=timechartString, cb=cb, err=err);
+    timechart(timechartString) {
+        return self._search(timechartString=timechartString);
     }
 }
 
@@ -65,8 +63,8 @@ class EventsClient {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
     }
-    ingest(events, cb, err) {
-        fetch(urljoin(this.BASE_URL, 'events'), {
+    ingest(events) {
+        return fetch(urljoin(this.BASE_URL, 'events'), {
             method: 'POST',
             body: JSON.stringify(events),
             headers: {
@@ -74,9 +72,7 @@ class EventsClient {
                 'Authorization': `Basic ${base64.encode(`${this.clientId}:${this.clientSecret}`)}`
             }
         })
-            .then(res => res.json())
-            .then(json => cb(json))
-            .catch(error => err(error));
+            .then(res => res.json());
     }
     search(terms, earliest=null, latest=null) {
         return new EventSearch(urljoin(this.BASE_URL, 'events'), terms, this.clientId, this.clientSecret, earliest, latest);
