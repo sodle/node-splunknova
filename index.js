@@ -92,3 +92,5 @@ class SplunkNova {
         this.events = new EventsClient(urljoin(this.NOVA_BASE_URL, `v${this.NOVA_VERSION}`), this.NOVA_VERSION, clientId, clientSecret);
     }
 }
+
+module.exports = SplunkNova;
