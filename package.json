@@ -1,6 +1,6 @@
 {
   "name": "splunknova",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Splunk Project Nova client for NodeJS",
   "main": "index.js",
   "repository": {
