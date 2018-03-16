@@ -64,7 +64,7 @@ class EventsClient {
         this.clientSecret = clientSecret;
     }
     ingest(events) {
-        return fetch(urljoin(this.BASE_URL, 'events'), {
+        return fetch(this.BASE_URL, {
             method: 'POST',
             body: JSON.stringify(events),
             headers: {
@@ -75,7 +75,7 @@ class EventsClient {
             .then(res => res.json());
     }
     search(terms, earliest=null, latest=null) {
-        return new EventSearch(urljoin(this.BASE_URL, 'events'), terms, this.clientId, this.clientSecret, earliest, latest);
+        return new EventSearch(this.BASE_URL, terms, this.clientId, this.clientSecret, earliest, latest);
     }
 }
 
@@ -85,7 +85,7 @@ class SplunkNova {
         this.clientSecret = clientSecret;
         this.NOVA_BASE_URL = 'https://api.splunknova.com/';
         this.NOVA_VERSION = 1;
-        this.events = new EventsClient(urljoin(this.NOVA_BASE_URL, `v${this.NOVA_VERSION}`), this.NOVA_VERSION, clientId, clientSecret);
+        this.events = new EventsClient(urljoin(this.NOVA_BASE_URL, `v${this.NOVA_VERSION}`), clientId, clientSecret);
     }
 }
 
