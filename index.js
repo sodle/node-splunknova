@@ -50,10 +50,10 @@ class EventSearch {
         return this._search(index=index, count=count);
     }
     stats(statsString) {
-        return self._search(statsString=statsString);
+        return this._search(statsString=statsString);
     }
     timechart(timechartString) {
-        return self._search(timechartString=timechartString);
+        return this._search(timechartString=timechartString);
     }
 }
 
