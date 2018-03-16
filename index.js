@@ -20,24 +20,24 @@ class EventSearch {
     _encode_transforms() {
         return `eval ${this.transforms.join(', ')}`;
     }
-    _search(index=0, count=10, statsString=null, timechartString=null) {
+    _search(index=0, count=10, statsString, timechartString) {
         let timeString = '';
         if (this.earliest)
             timeString += `earliest_time=${this.earliest} `;
         if (this.latest)
             timeString += `latest_time=${this.latest} `;
-        let search = {
+        var searchObj = {
             keywords: timeString + this.search,
             index: index,
             count: count
         };
         if (this.transforms.length > 0)
-            search.transform = this._encode_transforms();
-        if (this.statsString)
-            search.report = `stats ${statsString}`;
-        else if (this.timechartString)
-            search.report = `timechart ${timechartString}`;
-        let query = queryString.stringify(search);
+            searchObj.transform = this._encode_transforms();
+        if (statsString)
+            searchObj.report = `stats ${statsString}`;
+        else if (timechartString)
+            searchObj.report = `timechart ${timechartString}`;
+        let query = queryString.stringify(searchObj);
         let uri = `${this.baseUrl}?${query}`;
         return fetch(uri, {
             headers: {
@@ -47,13 +47,13 @@ class EventSearch {
             .then(res => res.json());
     }
     events(index=0, count=10) {
-        return this._search(index=index, count=count);
+        return this._search(index, count);
     }
     stats(statsString) {
-        return this._search(statsString=statsString);
+        return this._search(0, 10, statsString);
     }
     timechart(timechartString) {
-        return this._search(timechartString=timechartString);
+        return this._search(0, 10, undefined, timechartString);
     }
 }
 
@@ -80,9 +80,13 @@ class EventsClient {
 }
 
 class SplunkNova {
-    constructor(clientId, clientSecret) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+    constructor(clientId=process.env.NOVA_API_KEY_ID, clientSecret=process.env.NOVA_API_KEY_SECRET) {
+        if (clientId && clientSecret) {
+            this.clientId = clientId;
+            this.clientSecret = clientSecret;
+        } else {
+            throw 'Nova API Key ID and Secret neither provided nor found in environment variables!';
+        }
         this.NOVA_BASE_URL = 'https://api.splunknova.com/';
         this.NOVA_VERSION = 1;
         this.events = new EventsClient(urljoin(this.NOVA_BASE_URL, `v${this.NOVA_VERSION}`), clientId, clientSecret);
